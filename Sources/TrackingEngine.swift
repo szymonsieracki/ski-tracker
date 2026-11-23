@@ -53,7 +53,7 @@ final class TrackingEngine: NSObject, ObservableObject, CLLocationManagerDelegat
         altimeter.stopRelativeAltitudeUpdates()
         closeCurrent()
         isTracking = false
-        SessionStore.save(segments)
+        SessionStore.add(segments)
     }
 
     // MARK: CLLocationManagerDelegate
@@ -109,16 +109,5 @@ final class TrackingEngine: NSObject, ObservableObject, CLLocationManagerDelegat
         let ok = c.kind == .lift ? c.duration > 30 : (c.duration > 10 && c.distance > 50)
         if ok { segments.append(c) }
         current = nil
-    }
-}
-
-enum SessionStore {
-    static var url: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("last_session.json")
-    }
-    static func save(_ s: [Segment]) { try? JSONEncoder().encode(s).write(to: url) }
-    static func load() -> [Segment] {
-        (try? JSONDecoder().decode([Segment].self, from: Data(contentsOf: url))) ?? []
     }
 }
